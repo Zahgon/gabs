@@ -23,13 +23,9 @@
 package gabs
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
-	"os"
-	"strconv"
 	"strings"
 )
 
@@ -95,35 +91,14 @@ func init() {
 // Because the characters '~' (%x7E) and '/' (%x2F) have special meanings in
 // gabs paths, '~' needs to be encoded as '~0' and '/' needs to be encoded as
 // '~1' when these characters appear in a reference key.
-func JSONPointerToSlice(path string) ([]string, error) {
-	if path == "" {
-		return nil, nil
-	}
-	if path[0] != '/' {
-		return nil, errors.New("failed to resolve JSON pointer: path must begin with '/'")
-	}
-	if path == "/" {
-		return []string{""}, nil
-	}
-	hierarchy := strings.Split(path, "/")[1:]
-	for i, v := range hierarchy {
-		hierarchy[i] = r1.Replace(v)
-	}
-	return hierarchy, nil
-}
+func JSONPointerToSlice(path string) ([]string, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // DotPathToSlice returns a slice of path segments parsed out of a dot path.
 //
 // Because '.' (%x2E) is the segment separator, it must be encoded as '~1'
 // if it appears in the reference key. Likewise, '~' (%x7E) must be encoded
 // as '~0' since it is the escape character for encoding '.'.
-func DotPathToSlice(path string) []string {
-	hierarchy := strings.Split(path, ".")
-	for i, v := range hierarchy {
-		hierarchy[i] = r2.Replace(v)
-	}
-	return hierarchy
-}
+func DotPathToSlice(path string) []string { _ = "STUB: not implemented"; return nil }
 
 //------------------------------------------------------------------------------
 
@@ -134,61 +109,13 @@ type Container struct {
 
 // Data returns the underlying value of the target element in the wrapped
 // structure.
-func (g *Container) Data() interface{} {
-	if g == nil {
-		return nil
-	}
-	return g.object
-}
+func (g *Container) Data() interface{} { _ = "STUB: not implemented"; return nil }
 
 //------------------------------------------------------------------------------
 
 func (g *Container) searchStrict(allowWildcard bool, hierarchy ...string) (*Container, error) {
-	object := g.Data()
-	for target := 0; target < len(hierarchy); target++ {
-		pathSeg := hierarchy[target]
-		switch typedObj := object.(type) {
-		case map[string]interface{}:
-			var ok bool
-			if object, ok = typedObj[pathSeg]; !ok {
-				return nil, fmt.Errorf("failed to resolve path segment '%v': key '%v' was not found", target, pathSeg)
-			}
-		case []interface{}:
-			if allowWildcard && pathSeg == "*" {
-				var tmpArray []interface{}
-				if (target + 1) >= len(hierarchy) {
-					tmpArray = typedObj
-				} else {
-					tmpArray = make([]interface{}, 0, len(typedObj))
-					for _, val := range typedObj {
-						if res := Wrap(val).Search(hierarchy[target+1:]...); res != nil {
-							tmpArray = append(tmpArray, res.Data())
-						}
-					}
-				}
-
-				if len(tmpArray) == 0 {
-					return nil, nil
-				}
-
-				return &Container{tmpArray}, nil
-			}
-			index, err := strconv.Atoi(pathSeg)
-			if err != nil {
-				return nil, fmt.Errorf("failed to resolve path segment '%v': found array but segment value '%v' could not be parsed into array index: %v", target, pathSeg, err)
-			}
-			if index < 0 {
-				return nil, fmt.Errorf("failed to resolve path segment '%v': found array but index '%v' is invalid", target, pathSeg)
-			}
-			if len(typedObj) <= index {
-				return nil, fmt.Errorf("failed to resolve path segment '%v': found array but index '%v' exceeded target array size of '%v'", target, pathSeg, len(typedObj))
-			}
-			object = typedObj[index]
-		default:
-			return nil, fmt.Errorf("failed to resolve path segment '%v': field '%v' was not found", target, pathSeg)
-		}
-	}
-	return &Container{object}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Search attempts to find and return an object within the wrapped structure by
@@ -198,10 +125,7 @@ func (g *Container) searchStrict(allowWildcard bool, hierarchy ...string) (*Cont
 // either a an integer which is interpreted as the index of the target, or the
 // character '*', in which case all elements are searched with the remaining
 // search hierarchy and the results returned within an array.
-func (g *Container) Search(hierarchy ...string) *Container {
-	c, _ := g.searchStrict(true, hierarchy...)
-	return c
-}
+func (g *Container) Search(hierarchy ...string) *Container { _ = "STUB: not implemented"; return nil }
 
 // Path searches the wrapped structure following a path in dot notation,
 // segments of this path are searched according to the same rules as Search.
@@ -209,9 +133,7 @@ func (g *Container) Search(hierarchy ...string) *Container {
 // Because the characters '~' (%x7E) and '.' (%x2E) have special meanings in
 // gabs paths, '~' needs to be encoded as '~0' and '.' needs to be encoded as
 // '~1' when these characters appear in a reference key.
-func (g *Container) Path(path string) *Container {
-	return g.Search(DotPathToSlice(path)...)
-}
+func (g *Container) Path(path string) *Container { _ = "STUB: not implemented"; return nil }
 
 // JSONPointer parses a JSON pointer path (https://tools.ietf.org/html/rfc6901)
 // and either returns a *gabs.Container containing the result or an error if the
@@ -221,73 +143,31 @@ func (g *Container) Path(path string) *Container {
 // gabs paths, '~' needs to be encoded as '~0' and '/' needs to be encoded as
 // '~1' when these characters appear in a reference key.
 func (g *Container) JSONPointer(path string) (*Container, error) {
-	hierarchy, err := JSONPointerToSlice(path)
-	if err != nil {
-		return nil, err
-	}
-	return g.searchStrict(false, hierarchy...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // S is a shorthand alias for Search.
-func (g *Container) S(hierarchy ...string) *Container {
-	return g.Search(hierarchy...)
-}
+func (g *Container) S(hierarchy ...string) *Container { _ = "STUB: not implemented"; return nil }
 
 // Exists checks whether a field exists within the hierarchy.
-func (g *Container) Exists(hierarchy ...string) bool {
-	return g.Search(hierarchy...) != nil
-}
+func (g *Container) Exists(hierarchy ...string) bool { _ = "STUB: not implemented"; return false }
 
 // ExistsP checks whether a dot notation path exists.
-func (g *Container) ExistsP(path string) bool {
-	return g.Exists(DotPathToSlice(path)...)
-}
+func (g *Container) ExistsP(path string) bool { _ = "STUB: not implemented"; return false }
 
 // Index attempts to find and return an element within a JSON array by an index.
-func (g *Container) Index(index int) *Container {
-	if array, ok := g.Data().([]interface{}); ok {
-		if index >= len(array) {
-			return nil
-		}
-		return &Container{array[index]}
-	}
-	return nil
-}
+func (g *Container) Index(index int) *Container { _ = "STUB: not implemented"; return nil }
 
 // Children returns a slice of all children of an array element. This also works
 // for objects, however, the children returned for an object will be in a random
 // order and you lose the names of the returned objects this way. If the
 // underlying container value isn't an array or map nil is returned.
-func (g *Container) Children() []*Container {
-	if array, ok := g.Data().([]interface{}); ok {
-		children := make([]*Container, len(array))
-		for i := 0; i < len(array); i++ {
-			children[i] = &Container{array[i]}
-		}
-		return children
-	}
-	if mmap, ok := g.Data().(map[string]interface{}); ok {
-		children := make([]*Container, 0, len(mmap))
-		for _, obj := range mmap {
-			children = append(children, &Container{obj})
-		}
-		return children
-	}
-	return nil
-}
+func (g *Container) Children() []*Container { _ = "STUB: not implemented"; return nil }
 
 // ChildrenMap returns a map of all the children of an object element. IF the
 // underlying value isn't a object then an empty map is returned.
-func (g *Container) ChildrenMap() map[string]*Container {
-	if mmap, ok := g.Data().(map[string]interface{}); ok {
-		children := make(map[string]*Container, len(mmap))
-		for name, obj := range mmap {
-			children[name] = &Container{obj}
-		}
-		return children
-	}
-	return map[string]*Container{}
-}
+func (g *Container) ChildrenMap() map[string]*Container { _ = "STUB: not implemented"; return nil }
 
 //------------------------------------------------------------------------------
 
@@ -301,206 +181,105 @@ func (g *Container) ChildrenMap() map[string]*Container {
 //
 // Returns a container of the new value or an error.
 func (g *Container) Set(value interface{}, hierarchy ...string) (*Container, error) {
-	if g == nil {
-		return nil, errors.New("failed to resolve path, container is nil")
-	}
-	if len(hierarchy) == 0 {
-		g.object = value
-		return g, nil
-	}
-	if g.object == nil {
-		g.object = map[string]interface{}{}
-	}
-	object := g.object
-
-	for target := 0; target < len(hierarchy); target++ {
-		pathSeg := hierarchy[target]
-		switch typedObj := object.(type) {
-		case map[string]interface{}:
-			if target == len(hierarchy)-1 {
-				object = value
-				typedObj[pathSeg] = object
-			} else if object = typedObj[pathSeg]; object == nil {
-				typedObj[pathSeg] = map[string]interface{}{}
-				object = typedObj[pathSeg]
-			}
-		case []interface{}:
-			if pathSeg == "-" {
-				if target < 1 {
-					return nil, errors.New("unable to append new array index at root of path")
-				}
-				if target == len(hierarchy)-1 {
-					object = value
-				} else {
-					object = map[string]interface{}{}
-				}
-				typedObj = append(typedObj, object)
-				if _, err := g.Set(typedObj, hierarchy[:target]...); err != nil {
-					return nil, err
-				}
-			} else {
-				index, err := strconv.Atoi(pathSeg)
-				if err != nil {
-					return nil, fmt.Errorf("failed to resolve path segment '%v': found array but segment value '%v' could not be parsed into array index: %v", target, pathSeg, err)
-				}
-				if index < 0 {
-					return nil, fmt.Errorf("failed to resolve path segment '%v': found array but index '%v' is invalid", target, pathSeg)
-				}
-				if len(typedObj) <= index {
-					return nil, fmt.Errorf("failed to resolve path segment '%v': found array but index '%v' exceeded target array size of '%v'", target, pathSeg, len(typedObj))
-				}
-				if target == len(hierarchy)-1 {
-					object = value
-					typedObj[index] = object
-				} else if object = typedObj[index]; object == nil {
-					return nil, fmt.Errorf("failed to resolve path segment '%v': field '%v' was not found", target, pathSeg)
-				}
-			}
-		default:
-			return nil, ErrPathCollision
-		}
-	}
-	return &Container{object}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // SetP sets the value of a field at a path using dot notation, any parts
 // of the path that do not exist will be constructed, and if a collision occurs
 // with a non object type whilst iterating the path an error is returned.
 func (g *Container) SetP(value interface{}, path string) (*Container, error) {
-	return g.Set(value, DotPathToSlice(path)...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // SetIndex attempts to set a value of an array element based on an index.
 func (g *Container) SetIndex(value interface{}, index int) (*Container, error) {
-	if array, ok := g.Data().([]interface{}); ok {
-		if index >= len(array) {
-			return nil, ErrOutOfBounds
-		}
-		array[index] = value
-		return &Container{array[index]}, nil
-	}
-	return nil, ErrNotArray
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // SetJSONPointer parses a JSON pointer path
 // (https://tools.ietf.org/html/rfc6901) and sets the leaf to a value. Returns
 // an error if the pointer could not be resolved due to missing fields.
 func (g *Container) SetJSONPointer(value interface{}, path string) (*Container, error) {
-	hierarchy, err := JSONPointerToSlice(path)
-	if err != nil {
-		return nil, err
-	}
-	return g.Set(value, hierarchy...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Object creates a new JSON object at a target path. Returns an error if the
 // path contains a collision with a non object type.
 func (g *Container) Object(hierarchy ...string) (*Container, error) {
-	return g.Set(map[string]interface{}{}, hierarchy...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ObjectP creates a new JSON object at a target path using dot notation.
 // Returns an error if the path contains a collision with a non object type.
 func (g *Container) ObjectP(path string) (*Container, error) {
-	return g.Object(DotPathToSlice(path)...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ObjectI creates a new JSON object at an array index. Returns an error if the
 // object is not an array or the index is out of bounds.
 func (g *Container) ObjectI(index int) (*Container, error) {
-	return g.SetIndex(map[string]interface{}{}, index)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Array creates a new JSON array at a path. Returns an error if the path
 // contains a collision with a non object type.
 func (g *Container) Array(hierarchy ...string) (*Container, error) {
-	return g.Set([]interface{}{}, hierarchy...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ArrayP creates a new JSON array at a path using dot notation. Returns an
 // error if the path contains a collision with a non object type.
 func (g *Container) ArrayP(path string) (*Container, error) {
-	return g.Array(DotPathToSlice(path)...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ArrayI creates a new JSON array within an array at an index. Returns an error
 // if the element is not an array or the index is out of bounds.
 func (g *Container) ArrayI(index int) (*Container, error) {
-	return g.SetIndex([]interface{}{}, index)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ArrayOfSize creates a new JSON array of a particular size at a path. Returns
 // an error if the path contains a collision with a non object type.
 func (g *Container) ArrayOfSize(size int, hierarchy ...string) (*Container, error) {
-	a := make([]interface{}, size)
-	return g.Set(a, hierarchy...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ArrayOfSizeP creates a new JSON array of a particular size at a path using
 // dot notation. Returns an error if the path contains a collision with a non
 // object type.
 func (g *Container) ArrayOfSizeP(size int, path string) (*Container, error) {
-	return g.ArrayOfSize(size, DotPathToSlice(path)...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ArrayOfSizeI create a new JSON array of a particular size within an array at
 // an index. Returns an error if the element is not an array or the index is out
 // of bounds.
 func (g *Container) ArrayOfSizeI(size, index int) (*Container, error) {
-	a := make([]interface{}, size)
-	return g.SetIndex(a, index)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Delete an element at a path, an error is returned if the element does not
 // exist or is not an object. In order to remove an array element please use
 // ArrayRemove.
-func (g *Container) Delete(hierarchy ...string) error {
-	if g == nil || g.object == nil {
-		return ErrNotObj
-	}
-	if len(hierarchy) == 0 {
-		return ErrInvalidQuery
-	}
-
-	object := g.object
-	target := hierarchy[len(hierarchy)-1]
-	if len(hierarchy) > 1 {
-		object = g.Search(hierarchy[:len(hierarchy)-1]...).Data()
-	}
-
-	if obj, ok := object.(map[string]interface{}); ok {
-		if _, ok = obj[target]; !ok {
-			return ErrNotFound
-		}
-		delete(obj, target)
-		return nil
-	}
-	if array, ok := object.([]interface{}); ok {
-		if len(hierarchy) < 2 {
-			return errors.New("unable to delete array index at root of path")
-		}
-		index, err := strconv.Atoi(target)
-		if err != nil {
-			return fmt.Errorf("failed to parse array index '%v': %v", target, err)
-		}
-		if index >= len(array) {
-			return ErrOutOfBounds
-		}
-		if index < 0 {
-			return ErrOutOfBounds
-		}
-		array = append(array[:index], array[index+1:]...)
-		g.Set(array, hierarchy[:len(hierarchy)-1]...)
-		return nil
-	}
-	return ErrNotObjOrArray
-}
+func (g *Container) Delete(hierarchy ...string) error { _ = "STUB: not implemented"; return nil }
 
 // DeleteP deletes an element at a path using dot notation, an error is returned
 // if the element does not exist.
-func (g *Container) DeleteP(path string) error {
-	return g.Delete(DotPathToSlice(path)...)
-}
+func (g *Container) DeleteP(path string) error { _ = "STUB: not implemented"; return nil }
 
 // MergeFn merges two objects using a provided function to resolve collisions.
 //
@@ -509,43 +288,11 @@ func (g *Container) DeleteP(path string) error {
 // Which ever value is returned becomes the new value in the destination object
 // at the location of the collision.
 func (g *Container) MergeFn(source *Container, collisionFn func(destination, source interface{}) interface{}) error {
-	var recursiveFnc func(map[string]interface{}, []string) error
-	recursiveFnc = func(mmap map[string]interface{}, path []string) error {
-		for key, value := range mmap {
-			newPath := make([]string, len(path))
-			copy(newPath, path)
-			newPath = append(newPath, key)
-			if g.Exists(newPath...) {
-				existingData := g.Search(newPath...).Data()
-				switch t := value.(type) {
-				case map[string]interface{}:
-					switch existingVal := existingData.(type) {
-					case map[string]interface{}:
-						if err := recursiveFnc(t, newPath); err != nil {
-							return err
-						}
-					default:
-						if _, err := g.Set(collisionFn(existingVal, t), newPath...); err != nil {
-							return err
-						}
-					}
-				default:
-					if _, err := g.Set(collisionFn(existingData, t), newPath...); err != nil {
-						return err
-					}
-				}
-			} else if _, err := g.Set(value, newPath...); err != nil {
-				// path doesn't exist. So set the value
-				return err
-			}
-		}
-		return nil
-	}
-	if mmap, ok := source.Data().(map[string]interface{}); ok {
-		return recursiveFnc(mmap, []string{})
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// path doesn't exist. So set the value
 
 // Merge a source object into an existing destination object. When a collision
 // is found within the merged structures (both a source and destination object
@@ -555,22 +302,7 @@ func (g *Container) MergeFn(source *Container, collisionFn func(destination, sou
 //
 // It is possible to merge structures will different collision behaviours with
 // MergeFn.
-func (g *Container) Merge(source *Container) error {
-	return g.MergeFn(source, func(dest, source interface{}) interface{} {
-		destArr, destIsArray := dest.([]interface{})
-		sourceArr, sourceIsArray := source.([]interface{})
-		if destIsArray {
-			if sourceIsArray {
-				return append(destArr, sourceArr...)
-			}
-			return append(destArr, source)
-		}
-		if sourceIsArray {
-			return append(append([]interface{}{}, dest), sourceArr...)
-		}
-		return []interface{}{dest, source}
-	})
-}
+func (g *Container) Merge(source *Container) error { _ = "STUB: not implemented"; return nil }
 
 //------------------------------------------------------------------------------
 
@@ -584,27 +316,16 @@ then reassign with Set.
 // target is not a JSON array then it will be converted into one, with its
 // original contents set to the first element of the array.
 func (g *Container) ArrayAppend(value interface{}, hierarchy ...string) error {
-	if array, ok := g.Search(hierarchy...).Data().([]interface{}); ok {
-		array = append(array, value)
-		_, err := g.Set(array, hierarchy...)
-		return err
-	}
-
-	newArray := []interface{}{}
-	if d := g.Search(hierarchy...).Data(); d != nil {
-		newArray = append(newArray, d)
-	}
-	newArray = append(newArray, value)
-
-	_, err := g.Set(newArray, hierarchy...)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ArrayAppendP attempts to append a value onto a JSON array at a path using dot
 // notation. If the target is not a JSON array then it will be converted into
 // one, with its original contents set to the first element of the array.
 func (g *Container) ArrayAppendP(value interface{}, path string) error {
-	return g.ArrayAppend(value, DotPathToSlice(path)...)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ArrayConcat attempts to append a value onto a JSON array at a path. If the
@@ -615,31 +336,17 @@ func (g *Container) ArrayAppendP(value interface{}, path string) error {
 // []interface{} during the append operation, resulting in concatenation of each
 // element, rather than append as a single element of []interface{}.
 func (g *Container) ArrayConcat(value interface{}, hierarchy ...string) error {
-	var array []interface{}
-	if d := g.Search(hierarchy...).Data(); d != nil {
-		if targetArray, ok := d.([]interface{}); !ok {
-			// If the data exists, and it is not a slice of interface,
-			// append it as the first element of our new array.
-			array = append(array, d)
-		} else {
-			// If the data exists, and it is a slice of interface,
-			// assign it to our variable.
-			array = targetArray
-		}
-	}
-
-	switch v := value.(type) {
-	case []interface{}:
-		// If we have been given a slice of interface, expand it when appending.
-		array = append(array, v...)
-	default:
-		array = append(array, v)
-	}
-
-	_, err := g.Set(array, hierarchy...)
-
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// If the data exists, and it is not a slice of interface,
+// append it as the first element of our new array.
+
+// If the data exists, and it is a slice of interface,
+// assign it to our variable.
+
+// If we have been given a slice of interface, expand it when appending.
 
 // ArrayConcatP attempts to append a value onto a JSON array at a path using dot
 // notation. If the target is not a JSON array then it will be converted into one,
@@ -649,109 +356,58 @@ func (g *Container) ArrayConcat(value interface{}, hierarchy ...string) error {
 // []interface{} during the append operation, resulting in concatenation of each
 // element, rather than append as a single element of []interface{}.
 func (g *Container) ArrayConcatP(value interface{}, path string) error {
-	return g.ArrayConcat(value, DotPathToSlice(path)...)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ArrayRemove attempts to remove an element identified by an index from a JSON
 // array at a path.
 func (g *Container) ArrayRemove(index int, hierarchy ...string) error {
-	if index < 0 {
-		return ErrOutOfBounds
-	}
-	array, ok := g.Search(hierarchy...).Data().([]interface{})
-	if !ok {
-		return ErrNotArray
-	}
-	if index < len(array) {
-		array = append(array[:index], array[index+1:]...)
-	} else {
-		return ErrOutOfBounds
-	}
-	_, err := g.Set(array, hierarchy...)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ArrayRemoveP attempts to remove an element identified by an index from a JSON
 // array at a path using dot notation.
 func (g *Container) ArrayRemoveP(index int, path string) error {
-	return g.ArrayRemove(index, DotPathToSlice(path)...)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ArrayElement attempts to access an element by an index from a JSON array at a
 // path.
 func (g *Container) ArrayElement(index int, hierarchy ...string) (*Container, error) {
-	if index < 0 {
-		return nil, ErrOutOfBounds
-	}
-	array, ok := g.Search(hierarchy...).Data().([]interface{})
-	if !ok {
-		return nil, ErrNotArray
-	}
-	if index < len(array) {
-		return &Container{array[index]}, nil
-	}
-	return nil, ErrOutOfBounds
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ArrayElementP attempts to access an element by an index from a JSON array at
 // a path using dot notation.
 func (g *Container) ArrayElementP(index int, path string) (*Container, error) {
-	return g.ArrayElement(index, DotPathToSlice(path)...)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ArrayCount counts the number of elements in a JSON array at a path.
 func (g *Container) ArrayCount(hierarchy ...string) (int, error) {
-	if array, ok := g.Search(hierarchy...).Data().([]interface{}); ok {
-		return len(array), nil
-	}
-	return 0, ErrNotArray
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 // ArrayCountP counts the number of elements in a JSON array at a path using dot
 // notation.
-func (g *Container) ArrayCountP(path string) (int, error) {
-	return g.ArrayCount(DotPathToSlice(path)...)
-}
+func (g *Container) ArrayCountP(path string) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 //------------------------------------------------------------------------------
 
 func walkObject(path string, obj, flat map[string]interface{}, includeEmpty bool) {
-	if includeEmpty && len(obj) == 0 {
-		flat[path] = struct{}{}
-	}
-	for elePath, v := range obj {
-		if len(path) > 0 {
-			elePath = path + "." + elePath
-		}
-		switch t := v.(type) {
-		case map[string]interface{}:
-			walkObject(elePath, t, flat, includeEmpty)
-		case []interface{}:
-			walkArray(elePath, t, flat, includeEmpty)
-		default:
-			flat[elePath] = t
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 func walkArray(path string, arr []interface{}, flat map[string]interface{}, includeEmpty bool) {
-	if includeEmpty && len(arr) == 0 {
-		flat[path] = []struct{}{}
-	}
-	for i, ele := range arr {
-		elePath := strconv.Itoa(i)
-		if len(path) > 0 {
-			elePath = path + "." + elePath
-		}
-		switch t := ele.(type) {
-		case map[string]interface{}:
-			walkObject(elePath, t, flat, includeEmpty)
-		case []interface{}:
-			walkArray(elePath, t, flat, includeEmpty)
-		default:
-			flat[elePath] = t
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // Flatten a JSON array or object into an object of key/value pairs for each
@@ -764,65 +420,51 @@ func walkArray(path string, arr []interface{}, flat map[string]interface{}, incl
 //
 // Returns an error if the target is not a JSON object or array.
 func (g *Container) Flatten() (map[string]interface{}, error) {
-	return g.flatten(false)
+	_ = "STUB: not implemented"
+	return nil,
+
+		// FlattenIncludeEmpty a JSON array or object into an object of key/value pairs
+		// for each field, just as Flatten, but includes empty arrays and objects, where
+		// the key is the full path of the structured field in dot path notation matching
+		// the spec for the method Path.
+		//
+		// E.g. the structure `{"foo": [{"bar":[]},{"bar":{}}]}` would flatten into the
+		// object: `{"foo.0.bar":[],"foo.1.bar":{}}`.
+		//
+		// Returns an error if the target is not a JSON object or array.
+		nil
 }
 
-// FlattenIncludeEmpty a JSON array or object into an object of key/value pairs
-// for each field, just as Flatten, but includes empty arrays and objects, where
-// the key is the full path of the structured field in dot path notation matching
-// the spec for the method Path.
-//
-// E.g. the structure `{"foo": [{"bar":[]},{"bar":{}}]}` would flatten into the
-// object: `{"foo.0.bar":[],"foo.1.bar":{}}`.
-//
-// Returns an error if the target is not a JSON object or array.
 func (g *Container) FlattenIncludeEmpty() (map[string]interface{}, error) {
-	return g.flatten(true)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (g *Container) flatten(includeEmpty bool) (map[string]interface{}, error) {
-	flattened := map[string]interface{}{}
-	switch t := g.Data().(type) {
-	case map[string]interface{}:
-		walkObject("", t, flattened, includeEmpty)
-	case []interface{}:
-		walkArray("", t, flattened, includeEmpty)
-	default:
-		return nil, ErrNotObjOrArray
-	}
-	return flattened, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 //------------------------------------------------------------------------------
 
 // Bytes marshals an element to a JSON []byte blob.
-func (g *Container) Bytes() []byte {
-	if data, err := json.Marshal(g.Data()); err == nil {
-		return data
-	}
-	return []byte("null")
-}
+func (g *Container) Bytes() []byte { _ = "STUB: not implemented"; return nil }
 
 // BytesIndent marshals an element to a JSON []byte blob formatted with a prefix
 // and indent string.
 func (g *Container) BytesIndent(prefix, indent string) []byte {
-	if g.object != nil {
-		if data, err := json.MarshalIndent(g.Data(), prefix, indent); err == nil {
-			return data
-		}
-	}
-	return []byte("null")
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // String marshals an element to a JSON formatted string.
-func (g *Container) String() string {
-	return string(g.Bytes())
-}
+func (g *Container) String() string { _ = "STUB: not implemented"; return "" }
 
 // StringIndent marshals an element to a JSON string formatted with a prefix and
 // indent string.
 func (g *Container) StringIndent(prefix, indent string) string {
-	return string(g.BytesIndent(prefix, indent))
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // EncodeOpt is a functional option for the EncodeJSON method.
@@ -830,105 +472,54 @@ type EncodeOpt func(e *json.Encoder)
 
 // EncodeOptHTMLEscape sets the encoder to escape the JSON for html.
 func EncodeOptHTMLEscape(doEscape bool) EncodeOpt {
-	return func(e *json.Encoder) {
-		e.SetEscapeHTML(doEscape)
-	}
+	_ = "STUB: not implemented"
+	return *new(EncodeOpt)
 }
 
 // EncodeOptIndent sets the encoder to indent the JSON output.
 func EncodeOptIndent(prefix, indent string) EncodeOpt {
-	return func(e *json.Encoder) {
-		e.SetIndent(prefix, indent)
-	}
+	_ = "STUB: not implemented"
+	return *new(EncodeOpt)
 }
 
 // EncodeJSON marshals an element to a JSON formatted []byte using a variant
 // list of modifier functions for the encoder being used. Functions for
 // modifying the output are prefixed with EncodeOpt, e.g. EncodeOptHTMLEscape.
 func (g *Container) EncodeJSON(encodeOpts ...EncodeOpt) []byte {
-	var b bytes.Buffer
-	encoder := json.NewEncoder(&b)
-	encoder.SetEscapeHTML(false) // Do not escape by default.
-	for _, opt := range encodeOpts {
-		opt(encoder)
-	}
-	if err := encoder.Encode(g.object); err != nil {
-		return []byte("null")
-	}
-	result := b.Bytes()
-	if len(result) > 0 {
-		result = result[:len(result)-1]
-	}
-	return result
+	_ = "STUB: not implemented"
+	return nil
 }
 
+// Do not escape by default.
+
 // New creates a new gabs JSON object.
-func New() *Container {
-	return &Container{map[string]interface{}{}}
-}
+func New() *Container { _ = "STUB: not implemented"; return nil }
 
 // Wrap an already unmarshalled JSON object (or a new map[string]interface{})
 // into a *Container.
-func Wrap(root interface{}) *Container {
-	return &Container{root}
-}
+func Wrap(root interface{}) *Container { _ = "STUB: not implemented"; return nil }
 
 // ParseJSON unmarshals a JSON byte slice into a *Container.
-func ParseJSON(sample []byte) (*Container, error) {
-	var gabs Container
-
-	if err := json.Unmarshal(sample, &gabs.object); err != nil {
-		return nil, err
-	}
-
-	return &gabs, nil
-}
+func ParseJSON(sample []byte) (*Container, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // ParseJSONDecoder applies a json.Decoder to a *Container.
 func ParseJSONDecoder(decoder *json.Decoder) (*Container, error) {
-	var gabs Container
-
-	if err := decoder.Decode(&gabs.object); err != nil {
-		return nil, err
-	}
-
-	return &gabs, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // ParseJSONFile reads a file and unmarshals the contents into a *Container.
-func ParseJSONFile(path string) (*Container, error) {
-	if len(path) > 0 {
-		cBytes, err := os.ReadFile(path)
-		if err != nil {
-			return nil, err
-		}
-
-		container, err := ParseJSON(cBytes)
-		if err != nil {
-			return nil, err
-		}
-
-		return container, nil
-	}
-	return nil, ErrInvalidPath
-}
+func ParseJSONFile(path string) (*Container, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // ParseJSONBuffer reads a buffer and unmarshals the contents into a *Container.
 func ParseJSONBuffer(buffer io.Reader) (*Container, error) {
-	var gabs Container
-	jsonDecoder := json.NewDecoder(buffer)
-	if err := jsonDecoder.Decode(&gabs.object); err != nil {
-		return nil, err
-	}
-
-	return &gabs, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // MarshalJSON returns the JSON encoding of this container. This allows
 // structs which contain Container instances to be marshaled using
 // json.Marshal().
-func (g *Container) MarshalJSON() ([]byte, error) {
-	return json.Marshal(g.Data())
-}
+func (g *Container) MarshalJSON() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 //------------------------------------------------------------------------------
